@@ -1,0 +1,26 @@
+# Object files, in general
+*.vo
+*.vok
+*.vos
+*.glob
+*.o
+*.a
+*.cmi
+*.cmo
+*.cmx
+*.cma
+*.cmxa
+.*.aux
+*.cmti
+*.cmt
+# Emacs saves
+*~
+# Executables
+*.exe
+# Other generated files
+CoqMakefile
+CoqMakefile.conf
+.CoqMakefile.d
+.lia.cache
+benchmark/benchmark.ml
+benchmark/benchmark.mli

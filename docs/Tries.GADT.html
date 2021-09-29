@@ -1,0 +1,367 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Tries.GADT</title>
+<meta name="description" content="Documentation of Coq module Tries.GADT" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Tries.GADT</h1>
+<div class="coq">
+<h1> Binary tries using a GADT to enforce extensionality </h1>
+<br/>
+<br/>
+<span class="id">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.PArith.PArith.html">PArith</a></span>.<br/>
+<br/>
+<span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="id">Arguments</span>.<br/>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="PTree">PTree</a></span>.<br/>
+<br/>
+<h2> Representation of tries </h2>
+<br/>
+<div class="doc">We start with the two-constructor representation of binary tries
+    from module <span class="bracket"><span class="id">Original</span></span> and add a parameter of type <span class="bracket"><span class="id">kind</span></span> to the datatype,
+    indicating whether the binary trie is empty or nonempty. </div>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="PTree.kind">kind</a></span> : <span class="kwd">Type</span> := <span class="id"><a name="PTree.Empty">Empty</a></span> | <span class="id"><a name="PTree.Nonempty">Nonempty</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+<div class="doc">As in the <span class="bracket"><span class="id">Sigma</span></span> implementation, we want to exclude trivially empty nodes
+    <span class="bracket"><span class="id">Node</span> <span class="id">l</span> <span class="id">None</span> <span class="id">r</span></span> where both subtrees <span class="bracket"><span class="id">l</span></span> and <span class="bracket"><span class="id">r</span></span> are empty.
+    Unlike in the <span class="bracket"><span class="id">Sigma</span></span> implementation, we express this criterion
+    indirectly, using the kinds <span class="bracket"><span class="id">kl</span></span> of <span class="bracket"><span class="id">l</span></span> and <span class="bracket"><span class="id">kr</span></span> of <span class="bracket"><span class="id">r</span></span>. </div>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="PTree.not_trivially_empty">not_trivially_empty</a></span> {<span class="id">A</span>} (<span class="id">kl</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) (<span class="id">o</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span>) (<span class="id">kr</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">kl</span>, <span class="id">o</span>, <span class="id">kr</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Empty">Empty</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>, <span class="id"><a href="Tries.GADT.html#PTree.Empty">Empty</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#False">False</a></span><br/>
+&nbsp;&nbsp;| <span class="id">_</span>, <span class="id">_</span>, <span class="id">_</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span><br/>
+&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="PTree.not_trivially_empty_left">not_trivially_empty_left</a></span>: <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">o</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span>) (<span class="id">kr</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>),<br/>
+&nbsp;&nbsp;<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty">not_trivially_empty</a></span> <span class="id"><a href="Tries.GADT.html#PTree.Nonempty">Nonempty</a></span> <span class="id">o</span> <span class="id">kr</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof56')">Proof.</div>
+<div class="proofscript" id="proof56">
+&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">red</span>; <span class="tactic">auto</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="PTree.not_trivially_empty_val">not_trivially_empty_val</a></span>: <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">kl</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) (<span class="id">a</span>: <span class="id">A</span>) (<span class="id">kr</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>),<br/>
+&nbsp;&nbsp;<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty">not_trivially_empty</a></span> <span class="id">kl</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">a</span>) <span class="id">kr</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof57')">Proof.</div>
+<div class="proofscript" id="proof57">
+&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">red</span>. <span class="tactic">destruct</span> <span class="id">kl</span>; <span class="tactic">auto</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="PTree.not_trivially_empty_right">not_trivially_empty_right</a></span>: <span class="kwd">forall</span> <span class="id">A</span> (<span class="id">kl</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) (<span class="id">o</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span>),<br/>
+&nbsp;&nbsp;<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty">not_trivially_empty</a></span> <span class="id">kl</span> <span class="id">o</span> <span class="id"><a href="Tries.GADT.html#PTree.Nonempty">Nonempty</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof58')">Proof.</div>
+<div class="proofscript" id="proof58">
+&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">red</span>. <span class="tactic">destruct</span> <span class="id">kl</span>; <span class="tactic">auto</span>. <span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">auto</span>.<br/>
+Qed.</div>
+<br/>
+<div class="doc">The representation type for tries, with the extra parameter of
+    type kind that classifies tries as empty or nonempty.  In the
+    <span class="bracket"><span class="id">Node</span></span> case, we add a proof that the node is not trivially empty. </div>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="PTree.tree">tree</a></span> (<span class="id">A</span> : <span class="kwd">Type</span>) : <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span> -&gt; <span class="kwd">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="PTree.Leaf">Leaf</a></span> : <span class="id">tree</span> <span class="id">A</span> <span class="id"><a href="Tries.GADT.html#PTree.Empty">Empty</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="PTree.Node">Node</a></span> : <span class="kwd">forall</span> (<span class="id">kl</span> <span class="id">kr</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) (<span class="id">l</span>: <span class="id">tree</span> <span class="id">A</span> <span class="id">kl</span>) (<span class="id">o</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span>) (<span class="id">r</span>: <span class="id">tree</span> <span class="id">A</span> <span class="id">kr</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty">not_trivially_empty</a></span> <span class="id">kl</span> <span class="id">o</span> <span class="id">kr</span> -&gt; <span class="id">tree</span> <span class="id">A</span> <span class="id"><a href="Tries.GADT.html#PTree.Nonempty">Nonempty</a></span>.<br/>
+<br/>
+<span class="id">Arguments</span> <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> {<span class="id">A</span>}.<br/>
+<span class="id">Arguments</span> <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> [<span class="id">A</span> <span class="id">kl</span> <span class="id">kr</span>].<br/>
+<br/>
+<div class="doc">The type of tries (empty or nonempty) is a dependent sum of
+    an empty/nonempty kind and a representation of that kind.
+    In other words, we quantify existentially over the kind. </div>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="PTree.t">t</a></span> (<span class="id">A</span>: <span class="kwd">Type</span>) := { <span class="id">k</span> : <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span> &amp; <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k</span> }.<br/>
+&nbsp;&nbsp;<br/>
+<h2> Basic operations: <span class="bracket"><span class="id">empty</span></span>, <span class="bracket"><span class="id">get</span></span>, <span class="bracket"><span class="tactic">set</span></span>, <span class="bracket"><span class="id">remove</span></span> </h2>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="PTree.empty">empty</a></span> (<span class="id">A</span> : <span class="kwd">Type</span>) : <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span> := <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id"><a href="Tries.GADT.html#PTree.Empty">Empty</a></span> (@<span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> <span class="id">A</span>).<br/>
+<br/>
+<div class="doc">Operations such as <span class="bracket"><span class="id">get</span></span> are typically split in two functions:
+    a function <span class="bracket"><span class="id">get</span>'</span> that works over type <span class="bracket"><span class="id">tree</span> <span class="id">A</span> <span class="id">k</span></span> and is polymorphic
+    over the kind <span class="bracket"><span class="id">k</span></span>, and a wrapper function <span class="bracket"><span class="id">get</span></span> that deals with the
+    existential quantification over the kind <span class="bracket"><span class="id">k</span></span>. </div>
+<br/>
+<span class="kwd">Fixpoint</span> <span class="id">get</span>' (<span class="id">A</span> : <span class="kwd">Type</span>) (<span class="id">k</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) (<span class="id">i</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">m</span> : <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k</span>) {<span class="kwd">struct</span> <span class="id">i</span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">m</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">l</span> <span class="id">o</span> <span class="id">r</span> <span class="id">_</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">i</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xH">xH</a></span> =&gt; <span class="id">o</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xO">xO</a></span> <span class="id">ii</span> =&gt; <span class="id">get</span>' <span class="id">ii</span> <span class="id">l</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xI">xI</a></span> <span class="id">ii</span> =&gt; <span class="id">get</span>' <span class="id">ii</span> <span class="id">r</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="PTree.get">get</a></span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">m</span> : <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">m</span> <span class="kwd">with</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id">k</span> <span class="id">m</span> =&gt; <span class="id">get</span>' <span class="id">i</span> <span class="id">m</span> <span class="kwd">end</span>.<br/>
+&nbsp;&nbsp;<br/>
+<div class="doc"><span class="bracket"><span class="tactic">set</span>'</span> has a lovely result type <span class="bracket"><span class="id">tree</span> <span class="id">A</span> <span class="id">Nonempty</span></span>, proving that the result
+    is never the empty trie. </div>
+<br/>
+<span class="kwd">Fixpoint</span> <span class="tactic">set</span>' (<span class="id">A</span> : <span class="kwd">Type</span>) (<span class="id">k</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) (<span class="id">i</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">v</span> : <span class="id">A</span>) (<span class="id">m</span> : <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k</span>) {<span class="kwd">struct</span> <span class="id">i</span>} : <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id"><a href="Tries.GADT.html#PTree.Nonempty">Nonempty</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">m</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">i</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xH">xH</a></span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span>) <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> (<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_val">not_trivially_empty_val</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xO">xO</a></span> <span class="id">ii</span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> (<span class="tactic">set</span>' <span class="id">ii</span> <span class="id">v</span> <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span>) <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> (<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_left">not_trivially_empty_left</a></span> <span class="id">_</span> <span class="id">_</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xI">xI</a></span> <span class="id">ii</span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> (<span class="tactic">set</span>' <span class="id">ii</span> <span class="id">v</span> <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span>) (<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_right">not_trivially_empty_right</a></span> <span class="id">_</span> <span class="id">_</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">l</span> <span class="id">o</span> <span class="id">r</span> <span class="id">_</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">i</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xH">xH</a></span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">l</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span>) <span class="id">r</span> (<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_val">not_trivially_empty_val</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xO">xO</a></span> <span class="id">ii</span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> (<span class="tactic">set</span>' <span class="id">ii</span> <span class="id">v</span> <span class="id">l</span>) <span class="id">o</span> <span class="id">r</span> (<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_left">not_trivially_empty_left</a></span> <span class="id">_</span> <span class="id">_</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xI">xI</a></span> <span class="id">ii</span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">l</span> <span class="id">o</span> (<span class="tactic">set</span>' <span class="id">ii</span> <span class="id">v</span> <span class="id">r</span>) (<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_right">not_trivially_empty_right</a></span> <span class="id">_</span> <span class="id">_</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="tactic">set</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">v</span>: <span class="id">A</span>) (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>) : <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">m</span> <span class="kwd">with</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">m</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id"><a href="Tries.GADT.html#PTree.Nonempty">Nonempty</a></span> (<span class="tactic">set</span>' <span class="id">i</span> <span class="id">v</span> <span class="id">m</span>) <span class="kwd">end</span>.<br/>
+&nbsp;&nbsp;<br/>
+<div class="doc">This is the smart constructor <span class="bracket"><span class="id">Node</span>'</span> that combines any two subtrees
+    and optional value into a well-formed value of type <span class="bracket"><span class="id">t</span> <span class="id">A</span></span>. </div>
+<br/>
+<span class="kwd">Definition</span> <span class="id">Node</span>' (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">kl</span> <span class="id">kr</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) (<span class="id">l</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">kl</span>) (<span class="id">o</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span>) (<span class="id">r</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">kr</span>) : <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">o</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">v</span> <span class="kwd">as</span> <span class="id">o</span>' =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id"><a href="Tries.GADT.html#PTree.Nonempty">Nonempty</a></span> (<span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">l</span> <span class="id">o</span>' <span class="id">r</span> (<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_val">not_trivially_empty_val</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>))<br/>
+&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">l</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="kwd">as</span> <span class="id">l</span>' =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id"><a href="Tries.GADT.html#PTree.Nonempty">Nonempty</a></span> (<span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">l</span>' <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> <span class="id">r</span> (<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_left">not_trivially_empty_left</a></span> <span class="id">_</span> <span class="id">_</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">r</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="kwd">as</span> <span class="id">r</span>' =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id"><a href="Tries.GADT.html#PTree.Nonempty">Nonempty</a></span> (<span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> <span class="id">r</span>' (<span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_right">not_trivially_empty_right</a></span> <span class="id">_</span> <span class="id">_</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id"><a href="Tries.GADT.html#PTree.Empty">Empty</a></span> <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<div class="doc">Sometimes, one of the subtrees has type <span class="bracket"><span class="id">t</span> <span class="id">A</span></span> instead of <span class="bracket"><span class="id">tree</span> <span class="id">A</span> <span class="id">k</span></span>. </div>
+<br/>
+<span class="kwd">Definition</span> <span class="id">Node</span>'<span class="id">l</span> (<span class="id">A</span>: <span class="kwd">Type</span>) <span class="id">kr</span> (<span class="id">l</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>) (<span class="id">o</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span>) (<span class="id">r</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">kr</span>) : <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">l</span> <span class="kwd">with</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">ll</span> =&gt; <span class="id">Node</span>' <span class="id">ll</span> <span class="id">o</span> <span class="id">r</span> <span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id">Node</span>'<span class="id">r</span> (<span class="id">A</span>: <span class="kwd">Type</span>) <span class="id">kl</span> (<span class="id">l</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">kl</span>) (<span class="id">o</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span>) (<span class="id">r</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>) : <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">r</span> <span class="kwd">with</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">rr</span> =&gt; <span class="id">Node</span>' <span class="id">l</span> <span class="id">o</span> <span class="id">rr</span> <span class="kwd">end</span>.<br/>
+<br/>
+<div class="doc">The <span class="bracket"><span class="id">remove</span></span> function makes good use of these smart constructors. </div>
+<br/>
+<span class="kwd">Fixpoint</span> <span class="id">remove</span>' (<span class="id">A</span> : <span class="kwd">Type</span>) (<span class="id">k</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) (<span class="id">i</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">m</span> : <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k</span>) {<span class="kwd">struct</span> <span class="id">i</span>} : <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">i</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xH">xH</a></span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">m</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.empty">empty</a></span> <span class="id">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">l</span> <span class="id">o</span> <span class="id">r</span> <span class="id">_</span> =&gt; <span class="id">Node</span>' <span class="id">l</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> <span class="id">r</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xO">xO</a></span> <span class="id">ii</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">m</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.empty">empty</a></span> <span class="id">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">l</span> <span class="id">o</span> <span class="id">r</span> <span class="id">_</span> =&gt; <span class="id">Node</span>'<span class="id">l</span> (<span class="id">remove</span>' <span class="id">ii</span> <span class="id">l</span>) <span class="id">o</span> <span class="id">r</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xI">xI</a></span> <span class="id">ii</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">m</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.empty">empty</a></span> <span class="id">A</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Tries.GADT.html#PTree.Node">Node</a></span> <span class="id">l</span> <span class="id">o</span> <span class="id">r</span> <span class="id">_</span> =&gt; <span class="id">Node</span>'<span class="id">r</span> <span class="id">l</span> <span class="id">o</span> (<span class="id">remove</span>' <span class="id">ii</span> <span class="id">r</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="PTree.remove">remove</a></span> (<span class="id">A</span> : <span class="kwd">Type</span>) (<span class="id">i</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">m</span> : <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>) : <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">m</span> <span class="kwd">with</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">m</span> =&gt; <span class="id">remove</span>' <span class="id">i</span> <span class="id">m</span> <span class="kwd">end</span>.<br/>
+<br/>
+<h2> Good variable properties for the basic operations </h2>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="PTree.gleaf">gleaf</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span> : <span class="kwd">Type</span>) (<span class="id">i</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>), <span class="id">get</span>' <span class="id">i</span> (<span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span> : <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id"><a href="Tries.GADT.html#PTree.Empty">Empty</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof59')">Proof.</div>
+<div class="proofscript" id="proof59">
+ <span class="tactic">destruct</span> <span class="id">i</span>; <span class="tactic">auto</span>. Qed.</div>
+<br/>
+<span class="kwd">Theorem</span> <span class="id"><a name="PTree.gempty">gempty</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>), <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="id"><a href="Tries.GADT.html#PTree.empty">empty</a></span> <span class="id">A</span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof60')">Proof.</div>
+<div class="proofscript" id="proof60">
+ <span class="tactic">intros</span>. <span class="tactic">apply</span> <span class="id"><a href="Tries.GADT.html#PTree.gleaf">gleaf</a></span>. Qed.</div>
+&nbsp;&nbsp;<br/>
+<span class="kwd">Lemma</span> <span class="id">gss</span>':<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">x</span>: <span class="id">A</span>)  (<span class="id">k</span>: <span class="id"><a href="Tries.GADT.html#PTree.kind">kind</a></span>) (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k</span>),<br/>
+&nbsp;&nbsp;<span class="id">get</span>' <span class="id">i</span> (<span class="tactic">set</span>' <span class="id">i</span> <span class="id">x</span> <span class="id">m</span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">x</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof61')">Proof.</div>
+<div class="proofscript" id="proof61">
+&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">i</span>; <span class="tactic">destruct</span> <span class="id">m</span>; <span class="tactic">simpl</span>; <span class="tactic">auto</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Theorem</span> <span class="id"><a name="PTree.gss">gss</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">x</span>: <span class="id">A</span>) (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>), <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="tactic">set</span> <span class="id">i</span> <span class="id">x</span> <span class="id">m</span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">x</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof62')">Proof.</div>
+<div class="proofscript" id="proof62">
+&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">m</span> <span class="kwd">as</span> [<span class="id">k</span> <span class="id">m</span>]; <span class="tactic">simpl</span>. <span class="tactic">apply</span> <span class="id">gss</span>'.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">gso</span>':<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span> <span class="id">j</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">x</span>: <span class="id">A</span>) <span class="id">k</span> (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k</span>),<br/>
+&nbsp;&nbsp;<span class="id">i</span> &lt;&gt; <span class="id">j</span> -&gt; <span class="id">get</span>' <span class="id">i</span> (<span class="tactic">set</span>' <span class="id">j</span> <span class="id">x</span> <span class="id">m</span>) = <span class="id">get</span>' <span class="id">i</span> <span class="id">m</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof63')">Proof.</div>
+<div class="proofscript" id="proof63">
+&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">i</span>; <span class="tactic">intros</span>; <span class="tactic">destruct</span> <span class="id">j</span>; <span class="tactic">destruct</span> <span class="id">m</span>; <span class="tactic">simpl</span>;<br/>
+&nbsp;&nbsp;<span class="tactic">try</span> <span class="tactic">rewrite</span> &lt;- (<span class="id"><a href="Tries.GADT.html#PTree.gleaf">gleaf</a></span> <span class="id">A</span> <span class="id">i</span>); <span class="tactic">auto</span>; <span class="tactic">try</span> <span class="tactic">apply</span> <span class="id">IHi</span>; <span class="tactic">congruence</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Theorem</span> <span class="id"><a name="PTree.gso">gso</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span> <span class="id">j</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">x</span>: <span class="id">A</span>) (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>),<br/>
+&nbsp;&nbsp;<span class="id">i</span> &lt;&gt; <span class="id">j</span> -&gt; <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="tactic">set</span> <span class="id">j</span> <span class="id">x</span> <span class="id">m</span>) = <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> <span class="id">m</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof64')">Proof.</div>
+<div class="proofscript" id="proof64">
+&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">m</span> <span class="kwd">as</span> [<span class="id">k</span> <span class="id">m</span>]; <span class="tactic">simpl</span>. <span class="tactic">apply</span> <span class="id">gso</span>'; <span class="tactic">auto</span>.<br/>
+Qed.</div>
+&nbsp;&nbsp;<br/>
+<span class="kwd">Lemma</span> <span class="id">gnode</span>':<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) <span class="id">kl</span> (<span class="id">l</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">kl</span>) <span class="id">kr</span> (<span class="id">r</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">kr</span>) <span class="id">o</span> <span class="id">i</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="id">Node</span>' <span class="id">l</span> <span class="id">o</span> <span class="id">r</span>) =<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">i</span> <span class="kwd">with</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xH">xH</a></span> =&gt; <span class="id">o</span> | <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xO">xO</a></span> <span class="id">i</span> =&gt; <span class="id">get</span>' <span class="id">i</span> <span class="id">l</span> | <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xI">xI</a></span> <span class="id">i</span> =&gt; <span class="id">get</span>' <span class="id">i</span> <span class="id">r</span> <span class="kwd">end</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof65')">Proof.</div>
+<div class="proofscript" id="proof65">
+&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">unfold</span> <span class="id">Node</span>'.<br/>
+&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; [ | <span class="tactic">destruct</span> <span class="id">l</span>; [ <span class="tactic">destruct</span> <span class="id">r</span> | ]];<br/>
+&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">i</span>; <span class="tactic">simpl</span>; <span class="tactic">rewrite</span> ? <span class="id"><a href="Tries.GADT.html#PTree.gleaf">gleaf</a></span>; <span class="tactic">auto</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">gnode</span>'<span class="id">l</span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">l</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>) <span class="id">kr</span> (<span class="id">r</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">kr</span>) <span class="id">o</span> <span class="id">i</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="id">Node</span>'<span class="id">l</span> <span class="id">l</span> <span class="id">o</span> <span class="id">r</span>) =<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">i</span> <span class="kwd">with</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xH">xH</a></span> =&gt; <span class="id">o</span> | <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xO">xO</a></span> <span class="id">i</span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> <span class="id">l</span> | <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xI">xI</a></span> <span class="id">i</span> =&gt; <span class="id">get</span>' <span class="id">i</span> <span class="id">r</span> <span class="kwd">end</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof66')">Proof.</div>
+<div class="proofscript" id="proof66">
+&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">l</span> <span class="kwd">as</span> [<span class="id">kl</span> <span class="id">l</span>]; <span class="tactic">simpl</span>. <span class="tactic">apply</span> <span class="id">gnode</span>'.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">gnode</span>'<span class="id">r</span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) <span class="id">kl</span> (<span class="id">l</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">kl</span>) (<span class="id">r</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>) <span class="id">o</span> <span class="id">i</span>,<br/>
+&nbsp;&nbsp;<span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="id">Node</span>'<span class="id">r</span> <span class="id">l</span> <span class="id">o</span> <span class="id">r</span>) =<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">i</span> <span class="kwd">with</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xH">xH</a></span> =&gt; <span class="id">o</span> | <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xO">xO</a></span> <span class="id">i</span> =&gt; <span class="id">get</span>' <span class="id">i</span> <span class="id">l</span> | <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xI">xI</a></span> <span class="id">i</span> =&gt; <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> <span class="id">r</span> <span class="kwd">end</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof67')">Proof.</div>
+<div class="proofscript" id="proof67">
+&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">r</span> <span class="kwd">as</span> [<span class="id">kr</span> <span class="id">r</span>]; <span class="tactic">simpl</span>. <span class="tactic">apply</span> <span class="id">gnode</span>'.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">grs</span>':<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) <span class="id">k</span> (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k</span>), <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="id">remove</span>' <span class="id">i</span> <span class="id">m</span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof68')">Proof.</div>
+<div class="proofscript" id="proof68">
+<span class="kwd">Local</span> <span class="id">Opaque</span> <span class="id">Node</span>'.<br/>
+&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">i</span>; <span class="tactic">destruct</span> <span class="id">m</span>; <span class="tactic">simpl</span> <span class="id">remove</span>'; <span class="tactic">auto</span>; <span class="tactic">rewrite</span> ?<span class="id"><a href="Tries.GADT.html#PTree.gleaf">gleaf</a></span>, ?<span class="id">gnode</span>', ?<span class="id">gnode</span>'<span class="id">l</span>, ?<span class="id">gnode</span>'<span class="id">r</span>; <span class="tactic">auto</span>.<br/>
+Qed.</div>
+&nbsp;&nbsp;<br/>
+<span class="kwd">Theorem</span> <span class="id"><a name="PTree.grs">grs</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>), <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="id"><a href="Tries.GADT.html#PTree.remove">remove</a></span> <span class="id">i</span> <span class="id">m</span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof69')">Proof.</div>
+<div class="proofscript" id="proof69">
+&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">m</span> <span class="kwd">as</span> [<span class="id">k</span> <span class="id">m</span>]. <span class="tactic">apply</span> <span class="id">grs</span>'.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">gro</span>':<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span> <span class="id">j</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) <span class="id">k</span> (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k</span>),<br/>
+&nbsp;&nbsp;<span class="id">i</span> &lt;&gt; <span class="id">j</span> -&gt; <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="id">remove</span>' <span class="id">j</span> <span class="id">m</span>) = <span class="id">get</span>' <span class="id">i</span> <span class="id">m</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof70')">Proof.</div>
+<div class="proofscript" id="proof70">
+&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">i</span>; <span class="tactic">intros</span>; <span class="tactic">destruct</span> <span class="id">j</span>; <span class="tactic">destruct</span> <span class="id">m</span>; <span class="tactic">simpl</span> <span class="id">remove</span>';<br/>
+&nbsp;&nbsp;<span class="tactic">rewrite</span> ?<span class="id">gnode</span>', ?<span class="id">gnode</span>'<span class="id">l</span>, ?<span class="id">gnode</span>'<span class="id">r</span>, ?<span class="id"><a href="Tries.GADT.html#PTree.gleaf">gleaf</a></span>; <span class="tactic">auto</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">IHi</span>; <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">IHi</span>; <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Theorem</span> <span class="id"><a name="PTree.gro">gro</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">i</span> <span class="id">j</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#positive">positive</a></span>) (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>),<br/>
+&nbsp;&nbsp;<span class="id">i</span> &lt;&gt; <span class="id">j</span> -&gt; <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> (<span class="id"><a href="Tries.GADT.html#PTree.remove">remove</a></span> <span class="id">j</span> <span class="id">m</span>) = <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> <span class="id">m</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof71')">Proof.</div>
+<div class="proofscript" id="proof71">
+&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">m</span> <span class="kwd">as</span> [<span class="id">k</span> <span class="id">m</span>]. <span class="tactic">apply</span> <span class="id">gro</span>'; <span class="tactic">auto</span>.<br/>
+Qed.</div>
+<br/>
+<h2> The extensionality property </h2>
+<br/>
+<div class="doc">This is the key lemma to show extensionality: a value of type <span class="bracket"><span class="id">tree</span> <span class="id">A</span> <span class="id">k</span></span>
+    that contains no data (all <span class="bracket"><span class="id">get</span>'</span> queries return <span class="bracket"><span class="id">None</span></span>)
+    is equal to <span class="bracket"><span class="id">Leaf</span></span>, and moreover its kind <span class="bracket"><span class="id">k</span></span> is <span class="bracket"><span class="id">Empty</span></span>. </div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="PTree.extensionality_empty">extensionality_empty</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) <span class="id">k</span> (<span class="id">m</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">i</span>, <span class="id">get</span>' <span class="id">i</span> <span class="id">m</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">E</span>: <span class="id">k</span> = <span class="id"><a href="Tries.GADT.html#PTree.Empty">Empty</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_rect">eq_rect</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">m</span> <span class="id">_</span> <span class="id">E</span> = <span class="id"><a href="Tries.GADT.html#PTree.Leaf">Leaf</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof72')">Proof.</div>
+<div class="proofscript" id="proof72">
+&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">m</span>; <span class="tactic">intros</span> <span class="id">G</span>.<br/>
+- <span class="id">exists</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#refl_equal">refl_equal</a></span>; <span class="tactic">auto</span>.<br/>
+- <span class="tactic">destruct</span> <span class="id">IHm1</span> <span class="kwd">as</span> (<span class="id">E1</span> &amp; <span class="id">F1</span>). { <span class="tactic">intros</span>; <span class="tactic">apply</span> (<span class="id">G</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xO">xO</a></span> <span class="id">i</span>)). }<br/>
+&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">IHm2</span> <span class="kwd">as</span> (<span class="id">E2</span> &amp; <span class="id">F2</span>). { <span class="tactic">intros</span>; <span class="tactic">apply</span> (<span class="id">G</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xI">xI</a></span> <span class="id">i</span>)). }<br/>
+&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">o</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>). { <span class="tactic">apply</span> (<span class="id">G</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xH">xH</a></span>). }<br/>
+&nbsp;&nbsp;<span class="tactic">subst</span> <span class="id">kl</span> <span class="id">kr</span> <span class="id">o</span>. <span class="tactic">elim</span> <span class="id">n</span>.<br/>
+Qed.</div>
+<br/>
+<div class="doc">As in the <span class="bracket"><span class="id">Sigma</span></span> implementation, we also need the "uniqueness of
+    proofs" property for the <span class="bracket"><span class="id">not_trivially_empty</span></span> predicate.  We
+    could assume the proof irrelevance axiom and get it for free, but
+    it's not hard to show the property without using axioms. </div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="PTree.not_trivially_empty_unique_proofs">not_trivially_empty_unique_proofs</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">A</span> <span class="id">kl</span> (<span class="id">o</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id">A</span>) <span class="id">kr</span> (<span class="id">p1</span> <span class="id">p2</span>: <span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty">not_trivially_empty</a></span> <span class="id">kl</span> <span class="id">o</span> <span class="id">kr</span>),<br/>
+&nbsp;&nbsp;<span class="id">p1</span> = <span class="id">p2</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof73')">Proof.</div>
+<div class="proofscript" id="proof73">
+&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty">not_trivially_empty</a></span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">kl</span>, <span class="id">o</span>, <span class="id">kr</span>, <span class="id">p1</span>, <span class="id">p2</span>; <span class="tactic">auto</span>.<br/>
+Qed.</div>
+<br/>
+<div class="doc">It follows that two trees that are equivalent (all <span class="bracket"><span class="id">get</span>'</span> queries agree)
+    have the same kind and are equal.  The subtle point here is that the
+    two trees cannot be assumed to have the same kind, otherwise the
+    induction does not go through.  </div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a name="PTree.extensionality_rec">extensionality_rec</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) <span class="id">k1</span> (<span class="id">m1</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k1</span>) <span class="id">k2</span> (<span class="id">m2</span>: <span class="id"><a href="Tries.GADT.html#PTree.tree">tree</a></span> <span class="id">A</span> <span class="id">k2</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">i</span>, <span class="id">get</span>' <span class="id">i</span> <span class="id">m1</span> = <span class="id">get</span>' <span class="id">i</span> <span class="id">m2</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">E</span>: <span class="id">k1</span> = <span class="id">k2</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_rect">eq_rect</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">m1</span> <span class="id">_</span> <span class="id">E</span> = <span class="id">m2</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof74')">Proof.</div>
+<div class="proofscript" id="proof74">
+&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">m1</span> <span class="kwd">as</span> [ | <span class="id">kl1</span> <span class="id">kr1</span> <span class="id">l1</span> <span class="id">LREC</span> <span class="id">o1</span> <span class="id">r1</span> <span class="id">RREC</span> <span class="id">NT1</span>].<br/>
+&nbsp;&nbsp;- <span class="tactic">intros</span>. <span class="tactic">destruct</span> (<span class="id"><a href="Tries.GADT.html#PTree.extensionality_empty">extensionality_empty</a></span> <span class="id">m2</span>) <span class="kwd">as</span> (<span class="id">E1</span> &amp; <span class="id">E2</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="tactic">intros</span>. <span class="tactic">rewrite</span> &lt;- <span class="id">H</span>. <span class="tactic">apply</span> <span class="id"><a href="Tries.GADT.html#PTree.gleaf">gleaf</a></span>. }<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span> <span class="id">k2</span>. <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">E2</span>. <span class="tactic">subst</span> <span class="id">m2</span>. <span class="id">exists</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#refl_equal">refl_equal</a></span>; <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">m2</span> <span class="kwd">as</span> [ | <span class="id">kl2</span> <span class="id">kr2</span> <span class="id">l2</span> <span class="id">o2</span> <span class="id">r2</span> <span class="id">NT2</span>]; <span class="tactic">intros</span> <span class="id">SAME</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">apply</span> <span class="id"><a href="Tries.GADT.html#PTree.extensionality_empty">extensionality_empty</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">rewrite</span> <span class="id">SAME</span>. <span class="tactic">apply</span> <span class="id"><a href="Tries.GADT.html#PTree.gleaf">gleaf</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">destruct</span> (<span class="id">LREC</span> <span class="id">kl2</span> <span class="id">l2</span>) <span class="kwd">as</span> (<span class="id">EL</span> &amp; <span class="id">FL</span>).  { <span class="tactic">intros</span>. <span class="tactic">apply</span> (<span class="id">SAME</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xO">xO</a></span> <span class="id">i</span>)). }<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">RREC</span> <span class="id">kr2</span> <span class="id">r2</span>) <span class="kwd">as</span> (<span class="id">ER</span> &amp; <span class="id">FR</span>).  { <span class="tactic">intros</span>. <span class="tactic">apply</span> (<span class="id">SAME</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xI">xI</a></span> <span class="id">i</span>)). }<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">o1</span> = <span class="id">o2</span>). { <span class="tactic">apply</span> (<span class="id">SAME</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#xH">xH</a></span>). }<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span> <span class="id">kl2</span> <span class="id">kr2</span>. <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">FL</span>. <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">FR</span>. <span class="tactic">subst</span> <span class="id">l2</span> <span class="id">o2</span> <span class="id">r2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">NT1</span> = <span class="id">NT2</span>). { <span class="tactic">apply</span> <span class="id"><a href="Tries.GADT.html#PTree.not_trivially_empty_unique_proofs">not_trivially_empty_unique_proofs</a></span>. }<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span> <span class="id">NT2</span>. <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#refl_equal">refl_equal</a></span>; <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">Theorem</span> <span class="tactic">extensionality</span>:<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">A</span>: <span class="kwd">Type</span>) (<span class="id">m1</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>) (<span class="id">m2</span>: <span class="id"><a href="Tries.GADT.html#PTree.t">t</a></span> <span class="id">A</span>),<br/>
+&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">i</span>, <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> <span class="id">m1</span> = <span class="id"><a href="Tries.GADT.html#PTree.get">get</a></span> <span class="id">i</span> <span class="id">m2</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">m1</span> = <span class="id">m2</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof75')">Proof.</div>
+<div class="proofscript" id="proof75">
+&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">m1</span> <span class="kwd">as</span> [<span class="id">k1</span> <span class="id">m1</span>], <span class="id">m2</span> <span class="kwd">as</span> [<span class="id">k2</span> <span class="id">m2</span>]; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
+&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Tries.GADT.html#PTree.extensionality_rec">extensionality_rec</a></span> <span class="id">m1</span> <span class="id">m2</span>) <span class="kwd">as</span> (<span class="id">E1</span> &amp; <span class="id">E2</span>). <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;<span class="tactic">subst</span> <span class="id">k2</span>. <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">E2</span>. <span class="tactic">subst</span> <span class="id">m2</span>. <span class="tactic">auto</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Tries.GADT.html#PTree">PTree</a></span>.<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</a></div>
+</body>
+</html>

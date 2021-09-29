@@ -1,0 +1,12 @@
+-R . Tries
+Original.v
+Canonical.v
+Sigma.v
+GADT.v
+Node01.v
+CharTrie.v
+lib/PositiveOrder.v
+lib/AsciiOrder.v
+lib/StringOrder.v
+lib/String2pos.v
+benchmark/Benchmark.v
