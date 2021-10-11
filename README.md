@@ -1,6 +1,6 @@
 # Canonical Binary Trees, the Coq development
 
-This is the Coq development accompanying the paper *Canonical Binary Trees* by Andrew W. Appel and Xavier Leroy, 2021.
+This is the Coq development accompanying the paper [*Efficient Extensional Binary Trees*](https://hal.inria.fr/hal-03372247) by Andrew W. Appel and Xavier Leroy, 2021.
 
 ## Implementations of binary tries (finite maps indexed by positive numbers)
 
