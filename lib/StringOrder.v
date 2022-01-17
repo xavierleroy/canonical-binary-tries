@@ -53,7 +53,7 @@ Proof.
   destruct (ascii_compare a0 a); simpl; auto.
 Qed.
 
-(** Implementing the [OrderedType] interface *)
+(** Implementing the old [OrderedType] interface (for use with FSets and FMaps) *)
 
 Module OrderedString <: OrderedType.
 
@@ -94,6 +94,43 @@ Proof.
 Defined.
 
 End OrderedString.
+
+(** Implementing the new [OrderedType] interface (for use with MSets and MMaps) *)
+
+Module OrderedStringM <: Orders.OrderedType.
+
+Definition t := string.
+Definition eq := @eq string.
+Definition eq_equiv : Equivalence eq := eq_equivalence.
+Definition lt (x y: t) := string_compare x y = Lt.
+Lemma lt_strorder : StrictOrder lt.
+Proof.
+  constructor.
+- intro x. hnf. unfold lt. rewrite string_compare_refl. congruence.
+- exact string_compare_lt_trans.
+Qed.
+Lemma lt_compat : Proper (eq ==> eq ==> iff) lt.
+Proof.
+  constructor; unfold eq in *; congruence.
+Qed.
+Definition compare := string_compare.
+Lemma compare_spec :
+     forall x y : t, CompareSpec (eq x y) (lt x y) (lt y x) (compare x y).
+Proof.
+  intros. unfold eq, lt, compare. destruct (string_compare x y) eqn:E; constructor.
+- apply string_compare_eq; auto.
+- auto.
+- rewrite <- (string_compare_antisym x y), E. auto.
+Qed.
+Definition eq_dec : forall x y : t, {eq x y} + {~ eq x y}.
+Proof.
+  intros. unfold eq. destruct (string_compare x y) eqn:AC.
+- left. apply string_compare_eq; auto.
+- right; red; intros; subst y. rewrite string_compare_refl in AC; discriminate.
+- right; red; intros; subst y. rewrite string_compare_refl in AC; discriminate.
+Defined.
+
+End OrderedStringM.
 
 Require Import Extraction ExtrOcamlBasic ExtrOcamlString.
 
