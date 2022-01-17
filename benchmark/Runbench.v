@@ -18,8 +18,8 @@ Compute "Original (small numbers, x1000)".
 Time Eval vm_compute in (repeat 1000 TestOriginal.bench1 smallnumbers).
 Compute "Original (small numbers, cbv, x100)".
 Time Eval cbv in (repeat 100 TestOriginal.bench1 smallnumbers).
-Compute "Original (small numbers, cbn)".
-Time Eval cbn in (TestOriginal.bench1 smallnumbers).
+Compute "Original (small numbers, lazy)".
+Time Eval lazy in (repeat 100 TestOriginal.bench1 smallnumbers).
 Compute "Original (repeated keys, x10)".
 Time Eval vm_compute in (repeat 10 TestOriginal.bench2 tt).
 
@@ -29,8 +29,8 @@ Compute "Canonical (small numbers, x1000)".
 Time Eval vm_compute in (repeat 1000 TestCanonical.bench1 smallnumbers).
 Compute "Canonical (small numbers, cbv, x100)".
 Time Eval cbv in (repeat 100 TestCanonical.bench1 smallnumbers).
-Compute "Canonical (small numbers, cbn)".
-Time Eval cbn in (TestCanonical.bench1 smallnumbers).
+Compute "Canonical (small numbers, lazy)".
+Time Eval lazy in (repeat 100 TestCanonical.bench1 smallnumbers).
 Compute "Canonical (repeated keys, x10)".
 Time Eval vm_compute in (repeat 10 TestCanonical.bench2 tt).
 
@@ -40,8 +40,8 @@ Compute "Sigma (small numbers, x1000)".
 Time Eval vm_compute in (repeat 1000 TestSigma.bench1 smallnumbers).
 Compute "Sigma (small numbers, cbv, x100)".
 Time Eval cbv in (repeat 100 TestSigma.bench1 smallnumbers).
-Compute "Sigma (small numbers, cbn)".
-Time Eval cbn in (TestSigma.bench1 smallnumbers).
+Compute "Sigma (small numbers, lazy)".
+Time Eval lazy in (repeat 100 TestSigma.bench1 smallnumbers).
 Compute "Sigma (repeated keys, x10)".
 Time Eval vm_compute in (repeat 10 TestSigma.bench2 tt).
 
@@ -51,8 +51,8 @@ Compute "Node01 (small numbers, x1000)".
 Time Eval vm_compute in (repeat 1000 TestNode01.bench1 smallnumbers).
 Compute "Node01 (small numbers, cbv, x100)".
 Time Eval cbv in (repeat 100 TestNode01.bench1 smallnumbers).
-Compute "Node01 (small numbers, cbn)".
-Time Eval cbn in (TestNode01.bench1 smallnumbers).
+Compute "Node01 (small numbers, lazy)".
+Time Eval lazy in (repeat 100 TestNode01.bench1 smallnumbers).
 Compute "Node01 (repeated keys, x10)".
 Time Eval vm_compute in (repeat 10 TestNode01.bench2 tt).
 
@@ -62,8 +62,8 @@ Compute "GADT (small numbers, x1000)".
 Time Eval vm_compute in (repeat 1000 TestGADT.bench1 smallnumbers).
 Compute "GADT (small numbers, cbv, x100)".
 Time Eval cbv in (repeat 100 TestGADT.bench1 smallnumbers).
-Compute "GADT (small numbers, cbn)".
-Time Eval cbn in (TestGADT.bench1 smallnumbers).
+Compute "GADT (small numbers, lazy)".
+Time Eval lazy in (repeat 100 TestGADT.bench1 smallnumbers).
 Compute "GADT (repeated keys, x10)".
 Time Eval vm_compute in (repeat 10 TestGADT.bench2 tt).
 
