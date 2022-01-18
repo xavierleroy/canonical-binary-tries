@@ -49,6 +49,12 @@ let _ =
       time "GADT (small numbers)" TestGADT.bench1 smallnumbers (nrep * 10)
   | "g3" ->
       time "GADT (repeated keys)" TestGADT.bench2 () nrep
+  | "p1" ->
+      time "Patricia (words)" TestPatricia.bench1 poswords nrep
+  | "p2" ->
+      time "Patricia (small numbers)" TestPatricia.bench1 smallnumbers (nrep * 10)
+  | "p3" ->
+      time "Patricia (repeated keys)" TestPatricia.bench2 () nrep
   | "a1" ->
       time "AVLPositive (words)" TestAVLPositive.bench1 poswords nrep
   | "a2" ->

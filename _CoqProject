@@ -4,6 +4,7 @@ Canonical.v
 Sigma.v
 GADT.v
 Node01.v
+Patricia.v
 CharTrie.v
 lib/PositiveOrder.v
 lib/AsciiOrder.v

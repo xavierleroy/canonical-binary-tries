@@ -1,4 +1,4 @@
-ALLBENCHS=$(foreach x,o c s n g a, $(foreach y,1 2 3, $(x)$(y))) as ct os cs
+ALLBENCHS=$(foreach x,o c s n g p a, $(foreach y,1 2 3, $(x)$(y))) as ct os cs
 
 runbench: runbench.exe
 	for b in $(ALLBENCHS); do ./runbench.exe $$b; done

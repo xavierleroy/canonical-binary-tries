@@ -67,6 +67,17 @@ Time Eval lazy in (repeat 100 TestGADT.bench1 smallnumbers).
 Compute "GADT (repeated keys, x10)".
 Time Eval vm_compute in (repeat 10 TestGADT.bench2 tt).
 
+Compute "Patricia (words, x100)".
+Time Eval vm_compute in (repeat 100 TestPatricia.bench1 poswords).
+Compute "Patricia (small numbers, x1000)".
+Time Eval vm_compute in (repeat 1000 TestPatricia.bench1 smallnumbers).
+Compute "Patricia (small numbers, cbv, x100)".
+Time Eval cbv in (repeat 100 TestPatricia.bench1 smallnumbers).
+Compute "Patricia (small numbers, lazy, x100)".
+Time Eval lazy in (repeat 100 TestPatricia.bench1 smallnumbers).
+Compute "Patricia (repeated keys, x10)".
+Time Eval vm_compute in (repeat 10 TestPatricia.bench2 tt).
+
 Compute "AVLstring (words, x100)".
 Time Eval vm_compute in (repeat 100 TestAVLString.bench1 words).
 

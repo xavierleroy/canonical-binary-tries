@@ -1,6 +1,6 @@
 From Coq Require Import List String ZArith FMaps FMapAVL.
 From Tries Require Import String2pos StringOrder PositiveOrder.
-From Tries Require Original Canonical Sigma Node01 GADT CharTrie.
+From Tries Require Original Canonical Sigma Node01 GADT Patricia CharTrie.
 
 Local Open Scope string_scope.
 Local Open Scope list_scope.
@@ -83,6 +83,7 @@ Module TestCanonical := Test Canonical.PTree.
 Module TestSigma := Test Sigma.PTree.
 Module TestNode01 := Test Node01.PTree.
 Module TestGADT := Test GADT.PTree.
+Module TestPatricia := Test Patricia.PTree.
 
 (* Testing AVL maps with positives as keys *)
 
@@ -1156,7 +1157,7 @@ Definition poswords :=
 From Coq Require Import Extraction ExtrOcamlBasic ExtrOcamlString.
 
 Extraction "benchmark/benchmark.ml"
-  TestOriginal TestCanonical TestSigma TestNode01 TestGADT
+  TestOriginal TestCanonical TestSigma TestNode01 TestGADT TestPatricia
   TestAVLString TestAVLPositive TestCharTrie
   TestOriginalAsStringmap TestCanonicalAsStringmap
   words poswords smallnumbers.
