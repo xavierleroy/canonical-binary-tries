@@ -1,0 +1,13 @@
+Name: MMaps
+Title: Finite Modular Maps over Ordered Types
+Author: Pierre Letouzey
+Institution: Université de Paris - INRIA
+Description:
+  This contribution contains several implementations of finite maps over
+  arbitrary ordered types using functors. This is an udpdated version of
+  Coq Stdlib's FMaps.
+Keywords: Finite Sets, Sorted lists, Balanced trees, Red-black trees, AVL,
+                Functors, data structures
+
+Category: Computer Science/Data Types and Data Structures
+Category: Miscellaneous/Extracted Programs/Data structures

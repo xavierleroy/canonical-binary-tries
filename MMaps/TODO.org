@@ -1,0 +1,71 @@
+
+* TODO opam package, see :
+** https://coq.inria.fr/opam-packaging.html
+** https://github.com/coq-community/manifesto
+
+* TODO extra ops 
+** DONE filter + partition + for_all + exists
+** DONE singleton
+** split ?
+** min_binding, max_binding, choose ?
+** remove_min, remove_max ?
+** update (The one of OCaml, mixing find + add/remove)
+** gmerge (as already in AVL) ? unsure
+** mapo (from AVL and RBT) ?
+** common merge instance, such as diff, inter, union ? Cf Facts
+** of_list = fold add, of_sorted_list (cf treeify in RBT) ?
+
+* DONE add_cardinal_2 (cf PR Coq)
+** DONE SameKeys another equivalence on maps (on keys only) --> here named Eqdom
+
+* DONE short filenames (MMap.Interface au lieu de MMapInterface)
+
+* TODO improve demo.v
+** DONE Why ZM.Raw.key appears in Print map3 : "Definition key" was too early in Raw.Pack
+** TODO do we want ZM.key or Z ? How to choose ? Weird : R.key becomes Z, not ZM.key ?!
+** TODO R.empty without implicit elt ?
+** TODO type of Mkt ?
+** TODO test demo.v and Coq 8.11
+** TODO avoid printing message during compilation ?
+
+* TODO Maps on unit + Eqdom --> an MSets implementation
+** Issue : compare on sets ?
+
+* DONE : dilute Sord inside S, with a compare taking a elt_compare as argument ?
+** DONE improve generic implem in AVL, RBT
+** DONE improve generic implem in Positive
+** DONE args order in equal_spec vs. compare_spec
+** DONE facts : from compare_spec to compare_sym, compare_trans, StrictOrder, etc
+** DONE Maps as OrderedTypes ?
+
+* TODO fix weird specs like merge_spec1 (?)
+
+* TODO unified spec of add and remove based on some key_eqb (cf. add_o) ?
+** Not ideal since DecidableType K have K.eq_dec, not K.eqb
+
+* TODO AVL.gmerge could start by comparing height (better have the little map on the right)
+
+* TODO RBT could have ins_below, join, split, and merge via split+join ?
+** check complexity in this case ?
+
+* DONE module AVLproofs with AVL invariant proofs
+* DONE module RBTproofs with RedBlack invariant proofs
+
+* DONE Interface Raw and module Raw.Pack
+** Btw : why no need for apply ok in Raw.Pack.bindings_spec2 ??!!
+
+* TODO provide a MultiSets.v (and update it), cf Fset contrib
+
+* TODO document the expected complexities
+
+* TODO test extraction
+
+* DONE Reorganisation GenTree
+** DONE better name for the T module
+** DONE put MapsTo just after, instead of at the very end of (AVL/RBT).MakeRaw
+** DONE directly use In0 instead of two version (inductive vs exists) ?
+
+* DONE warnings in Coq 8.11
+** DONE Hints not in core
+
+#+STARTUP: showall
