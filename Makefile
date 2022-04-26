@@ -12,7 +12,7 @@ build: CoqMakefile
 	@$(MAKE) --no-print-directory -f CoqMakefile
 
 coqbench:
-	coqtop -R . Tries -batch -load-vernac-source benchmark/Runbench.v
+	coqtop -R . Tries -R mmaps MMaps -batch -load-vernac-source benchmark/Runbench.v
 
 ocamlbench:
 	@$(MAKE) --no-print-directory -C benchmark

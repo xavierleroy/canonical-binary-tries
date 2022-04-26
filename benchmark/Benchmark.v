@@ -1,4 +1,5 @@
-From Coq Require Import List String ZArith FMaps FMapAVL.
+From Coq Require Import List String ZArith POrderedType FMaps FMapAVL.
+From Tries.MMaps Require RBT.
 From Tries Require Import String2pos StringOrder PositiveOrder.
 From Tries Require Original Canonical Sigma Node01 GADT Patricia CharTrie.
 
@@ -98,6 +99,19 @@ End PositiveAVLTree.
 
 Module TestAVLPositive := Test PositiveAVLTree.
 
+(* Testing red-black maps with positives as keys *)
+
+Module PositiveRB := RBT.Make POrderedType.Positive_as_OT.
+
+Module PositiveRBTree <: BINARY_TRIE.
+  Definition t := PositiveRB.t.
+  Definition empty := @PositiveRB.empty.
+  Definition get := @PositiveRB.find.
+  Definition set := @PositiveRB.add.
+End PositiveRBTree.
+
+Module TestRBPositive := Test PositiveRBTree.
+
 (* Testing AVL maps with strings as keys *)
 
 Module StringAVL := FMapAVL.Make OrderedString.
@@ -108,6 +122,17 @@ Definition bench1 (l: list string) : bool :=
   benchgen (StringAVL.empty unit) (@StringAVL.add unit) (@StringAVL.find unit) l.
 
 End TestAVLString.
+
+(* Testing red-black maps with strings as keys *)
+
+Module StringRB := RBT.Make OrderedStringM.
+
+Module TestRBString.
+
+Definition bench1 (l: list string) : bool :=
+  benchgen (@StringRB.empty unit) (@StringRB.add unit) (@StringRB.find unit) l.
+
+End TestRBString.
 
 (* Testing character tries *)
 
@@ -132,6 +157,7 @@ End TestPTreeAsStringmap.
 
 Module TestOriginalAsStringmap := TestPTreeAsStringmap Original.PTree.
 Module TestCanonicalAsStringmap := TestPTreeAsStringmap Canonical.PTree.
+Module TestPatriciaAsStringmap := TestPTreeAsStringmap Patricia.PTree.
 
 (* The benchmark data *)
 
@@ -1158,6 +1184,6 @@ From Coq Require Import Extraction ExtrOcamlBasic ExtrOcamlString.
 
 Extraction "benchmark/benchmark.ml"
   TestOriginal TestCanonical TestSigma TestNode01 TestGADT TestPatricia
-  TestAVLString TestAVLPositive TestCharTrie
-  TestOriginalAsStringmap TestCanonicalAsStringmap
+  TestAVLString TestRBString TestAVLPositive TestRBPositive TestCharTrie
+  TestOriginalAsStringmap TestCanonicalAsStringmap TestPatriciaAsStringmap
   words poswords smallnumbers.

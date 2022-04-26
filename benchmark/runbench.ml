@@ -63,12 +63,22 @@ let _ =
       time "AVLPositive (repeated keys)" TestAVLPositive.bench2 () nrep
   | "as" ->
       time "AVLString (words)" TestAVLString.bench1 words nrep
+  | "r1" ->
+      time "RBPositive (words)" TestRBPositive.bench1 poswords nrep
+  | "r2" ->
+      time "RBPositive (small numbers)" TestRBPositive.bench1 smallnumbers (nrep * 10)
+  | "r3" ->
+      time "RBPositive (repeated keys)" TestRBPositive.bench2 () nrep
+  | "rs" ->
+      time "RBString (words)" TestRBString.bench1 words nrep
   | "ct" ->
       time "CharTrie (words)" TestCharTrie.bench1 words nrep
   | "os" ->
       time "Originalstring (words)" TestOriginalAsStringmap.bench1 words nrep
   | "cs" ->
       time "Canonicalstring (words)" TestCanonicalAsStringmap.bench1 words nrep
+  | "ps" ->
+      time "Patriciastring (words)" TestPatriciaAsStringmap.bench1 words nrep
   | s ->
       prerr_endline ("unknown test: " ^ s); exit 2
 

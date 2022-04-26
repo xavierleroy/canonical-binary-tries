@@ -10,4 +10,13 @@ lib/PositiveOrder.v
 lib/AsciiOrder.v
 lib/StringOrder.v
 lib/String2pos.v
+MMaps/Utils.v
+MMaps/Comparisons.v
+MMaps/Interface.v
+MMaps/Facts.v
+MMaps/Raw.v
+MMaps/WeakList.v
+MMaps/OrdList.v
+MMaps/GenTree.v
+MMaps/RBT.v
 benchmark/Benchmark.v
