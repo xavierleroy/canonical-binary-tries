@@ -9,6 +9,7 @@ This is the Coq development accompanying the paper [*Efficient Extensional Binar
 * [Node01.v](https://xavierleroy.org/canonical-binary-tries/Tries.Node01.html): a minor variant of the Original implementation, slightly more compact but still not extensional, used mostly for benchmarking.
 * [Sigma.v](https://xavierleroy.org/canonical-binary-tries/Tries.Sigma.html): an extensional but not very efficient implementation of binary tries obtained by wrapping the Original implementation in a sigma-type.
 * [GADT.v](https://xavierleroy.org/canonical-binary-tries/Tries.GADT.html): another extensional but not very efficient implementation of binary tries that uses GADTs and dependent types.
+* [Patricia.v](https://xavierleroy.org/canonical-binary-tries/Tries.Patricia.html): binary Patricia trees from section 12.3 of [_Functional algorithms, verified!_](https://functional-algorithms-verified.org/) by T. Nipkow et al.  About as efficient as the Canonical implementation but not extensional.
 
 ## Implementations of dictionaries (finite maps indexed by character strings)
 
