@@ -40,6 +40,17 @@ Definition benchgen (K A: Type)
     end in
   lookup l true.
 
+Definition dsizegen (K A: Type)
+                    (empty: A)
+                    (set: K -> unit -> A -> A)
+                    (l: list K) : A :=
+  let fix insert m l :=
+    match l with
+    | nil => m
+    | w :: l => insert (set w tt m) l
+    end in
+  insert empty l.
+
 Module Type BINARY_TRIE.
   Parameter t: Type -> Type.
   Parameter empty: forall (A: Type), t A.
@@ -76,6 +87,11 @@ Definition bench2gen (n: positive) :=
     end.
 
 Definition bench2 (x: unit) := bench2gen 1000000%positive.
+
+(* Insert all positives from l *)
+
+Definition dsize (l: list positive) :=
+  dsizegen (PT.empty unit) (@PT.set unit) l.
 
 End Test.
 
@@ -121,6 +137,9 @@ Module TestAVLString.
 Definition bench1 (l: list string) : bool :=
   benchgen (StringAVL.empty unit) (@StringAVL.add unit) (@StringAVL.find unit) l.
 
+Definition dsize (l: list string) :=
+  dsizegen (StringAVL.empty unit) (@StringAVL.add unit) l.
+
 End TestAVLString.
 
 (* Testing red-black maps with strings as keys *)
@@ -132,6 +151,9 @@ Module TestRBString.
 Definition bench1 (l: list string) : bool :=
   benchgen (@StringRB.empty unit) (@StringRB.add unit) (@StringRB.find unit) l.
 
+Definition dsize (l: list string) :=
+  dsizegen (@StringRB.empty unit) (@StringRB.add unit) l.
+
 End TestRBString.
 
 (* Testing character tries *)
@@ -140,6 +162,9 @@ Module TestCharTrie.
 
 Definition bench1 (l: list string) : bool :=
   benchgen (CharTrie.Stringmap.empty unit) (@CharTrie.Stringmap.set unit) (@CharTrie.Stringmap.get unit) l.
+
+Definition dsize (l: list string) :=
+  dsizegen (CharTrie.Stringmap.empty unit) (@CharTrie.Stringmap.set unit) l.
 
 End TestCharTrie.
 
@@ -151,6 +176,11 @@ Definition bench1 (l: list string) : bool :=
   benchgen (PT.empty unit)
            (fun s v t => PT.set (pos_of_string s) v t)
            (fun s t => PT.get (pos_of_string s) t)
+           l.
+
+Definition dsize (l: list string) :=
+  dsizegen (PT.empty unit)
+           (fun s v t => PT.set (pos_of_string s) v t)
            l.
 
 End TestPTreeAsStringmap.
