@@ -49,7 +49,7 @@ induction l; simpl; auto.
 destruct f; simpl; auto; f_equal; auto.
 Qed.
 
-Instance mapfilter_ext {A B} :
+Global Instance mapfilter_ext {A B} :
  Proper ((eq ==> eq) ==> eq ==> eq) (@mapfilter A B).
 Proof.
  intros f f' E l l' <-.
@@ -102,7 +102,7 @@ Proof.
 induction l; simpl; auto. destruct (h (f a)); simpl; f_equal; auto.
 Qed.
 
-Instance filter_ext {A} : Proper ((eq==>eq)==>eq==>eq) (@filter A).
+Global Instance filter_ext {A} : Proper ((eq==>eq)==>eq==>eq) (@filter A).
 Proof.
 intros f f' E l l' <-.
 induction l; simpl; auto. rewrite <- (E a); auto.
@@ -147,14 +147,14 @@ Proof.
 induction l; simpl; auto. destruct h; simpl; auto.
 Qed.
 
-Instance forallb_ext {A} : Proper ((eq==>eq)==>eq==>eq) (@forallb A).
+Global Instance forallb_ext {A} : Proper ((eq==>eq)==>eq==>eq) (@forallb A).
 Proof.
 intros f f' E l l' <-.
 induction l; simpl; auto. rewrite <- (E a); auto.
 destruct f; simpl; auto.
 Qed.
 
-Instance existsb_ext {A} : Proper ((eq==>eq)==>eq==>eq) (@existsb A).
+Global Instance existsb_ext {A} : Proper ((eq==>eq)==>eq==>eq) (@existsb A).
 Proof.
 intros f f' E l l' <-.
 induction l; simpl; auto. rewrite <- (E a); auto.

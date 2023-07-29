@@ -36,8 +36,8 @@ Lemma eq_refl x : K.eq x x. Proof. apply K.eq_equiv. Qed.
 Lemma eq_sym x y : K.eq x y -> K.eq y x. Proof. apply K.eq_equiv. Qed.
 Lemma eq_trans x y z : K.eq x y -> K.eq y z -> K.eq x z.
 Proof. apply K.eq_equiv. Qed.
-Hint Immediate eq_refl eq_sym : map.
-Hint Resolve eq_trans eq_equivalence K.eq_equiv : map.
+Global Hint Immediate eq_refl eq_sym : map.
+Global Hint Resolve eq_trans eq_equivalence K.eq_equiv : map.
 
 Definition eqb x y := if K.eq_dec x y then true else false.
 
@@ -81,12 +81,12 @@ Notation not_find_in_iff := not_in_find (only parsing).
 
 Infix "==" := Equal (at level 30).
 
-Instance Equal_equiv {elt} : Equivalence (@Equal elt).
+Global Instance Equal_equiv {elt} : Equivalence (@Equal elt).
 Proof.
 unfold Equal. split; congruence.
 Qed.
 
-Instance Eqdom_equiv {elt} : Equivalence (@Eqdom elt).
+Global Instance Eqdom_equiv {elt} : Equivalence (@Eqdom elt).
 Proof.
 split.
 - now intro m.
@@ -94,7 +94,7 @@ split.
 - intros m1 m2 m3 E E' y. now rewrite (E y), <-(E' y).
 Qed.
 
-Instance Equal_Eqdom {elt} : subrelation (@Equal elt) (@Eqdom elt).
+Global Instance Equal_Eqdom {elt} : subrelation (@Equal elt) (@Eqdom elt).
 Proof.
  intros x y E k. specialize (E k). now rewrite !in_find, E.
 Qed.
@@ -102,14 +102,14 @@ Qed.
 Arguments Equal {elt} m m'.
 Arguments Eqdom {elt} m m'.
 
-Instance MapsTo_m {elt} :
+Global Instance MapsTo_m {elt} :
   Proper (K.eq==>Logic.eq==>Equal==>iff) (@MapsTo elt).
 Proof.
 intros k k' Hk e e' <- m m' Hm. rewrite <- Hk.
 now rewrite <- !find_spec, Hm.
 Qed.
 
-Instance find_m {elt} : Proper (K.eq==>Equal==>Logic.eq) (@find elt).
+Global Instance find_m {elt} : Proper (K.eq==>Equal==>Logic.eq) (@find elt).
 Proof.
 intros k k' Hk m m' <-.
 rewrite eq_option_alt. intros. now rewrite !find_spec, Hk.
@@ -120,17 +120,17 @@ Qed.
     Since [Equal] implies [Eqdom], this allows nonetheless to
     rewrite later with [Equal]. *)
 
-Instance In_m {elt} : Proper (K.eq==>Eqdom==>iff) (@In elt).
+Global Instance In_m {elt} : Proper (K.eq==>Eqdom==>iff) (@In elt).
 Proof.
 intros k k' Hk m m' Hm. rewrite (Hm k). rewrite !in_find. now rewrite Hk.
 Qed.
 
-Instance mem_m {elt} : Proper (K.eq==>Eqdom==>Logic.eq) (@mem elt).
+Global Instance mem_m {elt} : Proper (K.eq==>Eqdom==>Logic.eq) (@mem elt).
 Proof.
 intros k k' Hk m m' Hm. now rewrite eq_bool_alt, !mem_spec, Hk, Hm.
 Qed.
 
-Instance Empty_m {elt} : Proper (Eqdom==>iff) (@Empty elt).
+Global Instance Empty_m {elt} : Proper (Eqdom==>iff) (@Empty elt).
 Proof.
 assert (forall m m' : t elt, Eqdom m m' -> Empty m -> Empty m').
 { intros m m' EQ EM x e MT.
@@ -140,13 +140,13 @@ assert (forall m m' : t elt, Eqdom m m' -> Empty m -> Empty m').
 intros m m' EQ. split; apply H; auto. symmetry; auto.
 Qed.
 
-Instance is_empty_m {elt} : Proper (Eqdom ==> Logic.eq) (@is_empty elt).
+Global Instance is_empty_m {elt} : Proper (Eqdom ==> Logic.eq) (@is_empty elt).
 Proof.
 intros m m' Hm. rewrite eq_bool_alt, !is_empty_spec.
 setoid_rewrite <- not_in_find. now setoid_rewrite Hm.
 Qed.
 
-Instance add_m {elt} : Proper (K.eq==>Logic.eq==>Equal==>Equal) (@add elt).
+Global Instance add_m {elt} : Proper (K.eq==>Logic.eq==>Equal==>Equal) (@add elt).
 Proof.
 intros k k' Hk e e' <- m m' Hm y.
 destruct (K.eq_dec k y) as [H|H].
@@ -154,7 +154,7 @@ destruct (K.eq_dec k y) as [H|H].
 - rewrite !add_spec2; trivial. now rewrite <- Hk.
 Qed.
 
-Instance remove_m {elt} : Proper (K.eq==>Equal==>Equal) (@remove elt).
+Global Instance remove_m {elt} : Proper (K.eq==>Equal==>Equal) (@remove elt).
 Proof.
 intros k k' Hk m m' Hm y.
 destruct (K.eq_dec k y) as [H|H].
@@ -162,7 +162,7 @@ destruct (K.eq_dec k y) as [H|H].
 - rewrite !remove_spec2; trivial. now rewrite <- Hk.
 Qed.
 
-Instance merge_m {elt elt' elt''} :
+Global Instance merge_m {elt elt' elt''} :
  Proper ((K.eq==>Logic.eq==>Logic.eq==>Logic.eq)==>Equal==>Equal==>Equal)
   (@merge elt elt' elt'').
 Proof.
@@ -344,14 +344,14 @@ Proof.
    exists e0. rewrite <- bindings_spec1, InA_alt. firstorder.
 Qed.
 
-Instance map_m {elt elt'} :
+Global Instance map_m {elt elt'} :
   Proper ((Logic.eq==>Logic.eq)==>Equal==>Equal) (@map elt elt').
 Proof.
 intros f f' Hf m m' Hm y. rewrite !map_find, Hm.
 destruct (find y m'); simpl; trivial. f_equal. now apply Hf.
 Qed.
 
-Instance mapi_m {elt elt'} :
+Global Instance mapi_m {elt elt'} :
   Proper ((K.eq==>Logic.eq==>Logic.eq)==>Equal==>Equal) (@mapi elt elt').
 Proof.
 intros f f' Hf m m' Hm y.
@@ -409,10 +409,10 @@ Lemma map2_2 {elt elt' elt''}(m: t elt)(m': t elt')
   In x (map2 f m m') -> In x m \/ In x m'.
 Proof. apply merge_spec2. Qed.
 
-Hint Immediate MapsTo_1 mem_2 is_empty_2 : map.
-Hint Immediate map_2 mapi_2 add_3 remove_3 find_2 : map.
-Hint Resolve mem_1 is_empty_1 is_empty_2 add_1 add_2 remove_1 : map.
-Hint Resolve remove_2 find_1 fold_1 map_1 mapi_1 mapi_2 : map.
+Global Hint Immediate MapsTo_1 mem_2 is_empty_2 : map.
+Global Hint Immediate map_2 mapi_2 add_3 remove_3 find_2 : map.
+Global Hint Resolve mem_1 is_empty_1 is_empty_2 add_1 add_2 remove_1 : map.
+Global Hint Resolve remove_2 find_1 fold_1 map_1 mapi_1 mapi_2 : map.
 
 (** ** Specifications written using equivalences *)
 
@@ -652,13 +652,13 @@ Qed.
     same domain before, same domain after, regardless of what happens
     to the datas. *)
 
-Instance add_m' {elt} : Proper (K.eq==>Logic.eq==>Eqdom==>Eqdom) (@add elt).
+Global Instance add_m' {elt} : Proper (K.eq==>Logic.eq==>Eqdom==>Eqdom) (@add elt).
 Proof.
 intros k k' Hk e e' <- m m' Hm y.
 rewrite !add_in_iff. now rewrite Hk, Hm.
 Qed.
 
-Instance remove_m' {elt} : Proper (K.eq==>Eqdom==>Eqdom) (@remove elt).
+Global Instance remove_m' {elt} : Proper (K.eq==>Eqdom==>Eqdom) (@remove elt).
 Proof.
 intros k k' Hk m m' Hm y.
 rewrite !remove_in_iff. now rewrite Hk, Hm.
@@ -667,13 +667,13 @@ Qed.
 (** Note : We could even use completely differents functions below,
     not equal ones *)
 
-Instance map_m' {elt elt'} :
+Global Instance map_m' {elt elt'} :
   Proper (Logic.eq==>Eqdom==>Eqdom) (@map elt elt').
 Proof.
 intros f f' <- m m' Hm y. rewrite !map_in_iff. apply Hm.
 Qed.
 
-Instance mapi_m' {elt elt'} :
+Global Instance mapi_m' {elt elt'} :
   Proper (Logic.eq==>Eqdom==>Eqdom) (@mapi elt elt').
 Proof.
 intros f f' <- m m' Hm y. rewrite !mapi_in_iff. apply Hm.
@@ -2345,14 +2345,14 @@ Section Elt.
   intros k k' e e' a b b' Hk <- <-. now apply add_add_2.
  Qed.
 
- Instance extend_m {elt} : Proper (Equal ==> Equal ==> Equal) (@extend elt).
+ Global Instance extend_m {elt} : Proper (Equal ==> Equal ==> Equal) (@extend elt).
  Proof.
   intros m1 m1' Hm1 m2 m2' Hm2.
   unfold extend.
   apply fold_Proper; auto using diamond_add with *.
  Qed.
 
- Instance restrict_m {elt} : Proper (Equal==>Equal==>Equal) (@restrict elt).
+ Global Instance restrict_m {elt} : Proper (Equal==>Equal==>Equal) (@restrict elt).
  Proof.
   intros m1 m1' Hm1 m2 m2' Hm2 y.
   unfold restrict.
@@ -2362,7 +2362,7 @@ Section Elt.
   clear. intros x x' Hx e e' He. now rewrite Hx.
  Qed.
 
- Instance diff_m {elt} : Proper (Equal==>Equal==>Equal) (@diff elt).
+ Global Instance diff_m {elt} : Proper (Equal==>Equal==>Equal) (@diff elt).
  Proof.
   intros m1 m1' Hm1 m2 m2' Hm2 y.
   unfold diff.
@@ -3028,17 +3028,17 @@ Module OrderedMaps (K:OrderedType)(D:OrderedType)(M:S K) <: OrderedType.
  Definition lt := P.lt D.compare.
  Definition compare := M.compare D.compare.
 
- Instance Dcompare_symtrans : SymTrans D.compare.
+ Global Instance Dcompare_symtrans : SymTrans D.compare.
  Proof.
  split. exact D'.compare_sym. exact D'.compare_trans.
  Qed.
 
- Instance compare_symtrans : SymTrans compare.
+ Global Instance compare_symtrans : SymTrans compare.
  Proof. apply P.compare_symtrans, Dcompare_symtrans. Qed.
 
- Instance eq_equiv : Equivalence eq := P.eq_equiv _.
- Instance lt_strorder : StrictOrder lt := P.lt_strorder _.
- Instance lt_compat : Proper (eq ==> eq ==> iff) lt := P.lt_compat _.
+ Global Instance eq_equiv : Equivalence eq := P.eq_equiv _.
+ Global Instance lt_strorder : StrictOrder lt := P.lt_strorder _.
+ Global Instance lt_compat : Proper (eq ==> eq ==> iff) lt := P.lt_compat _.
 
  Lemma compare_spec (m m' :t) :
   CompareSpec (eq m m') (lt m m') (lt m' m) (compare m m').
