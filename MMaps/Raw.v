@@ -91,23 +91,23 @@ Module Type WS (K : DecidableType).
                       t elt -> t elt' ->  t elt''.
   End Ops.
 
-  Declare Instance empty_ok {elt} : Ok (@empty elt).
-  Declare Instance singleton_ok {elt} x (e:elt) : Ok (singleton x e).
-  Declare Instance add_ok {elt} (m:t elt) x e `(!Ok m) :
+  Global Declare Instance empty_ok {elt} : Ok (@empty elt).
+  Global Declare Instance singleton_ok {elt} x (e:elt) : Ok (singleton x e).
+  Global Declare Instance add_ok {elt} (m:t elt) x e `(!Ok m) :
     Ok (add x e m).
-  Declare Instance remove_ok {elt} (m:t elt) x `(!Ok m) :
+  Global Declare Instance remove_ok {elt} (m:t elt) x `(!Ok m) :
     Ok (remove x m).
-  Declare Instance filter_ok {elt} f (m:t elt) `(!Ok m) :
+  Global Declare Instance filter_ok {elt} f (m:t elt) `(!Ok m) :
     Ok (filter f m).
-  Declare Instance partition_ok1 {elt} f (m:t elt) `(!Ok m) :
+  Global Declare Instance partition_ok1 {elt} f (m:t elt) `(!Ok m) :
     Ok (fst (partition f m)).
-  Declare Instance partition_ok2 {elt} f (m:t elt) `(!Ok m) :
+  Global Declare Instance partition_ok2 {elt} f (m:t elt) `(!Ok m) :
     Ok (snd (partition f m)).
-  Declare Instance map_ok {elt elt'}(f:elt->elt') m `(!Ok m) :
+  Global Declare Instance map_ok {elt elt'}(f:elt->elt') m `(!Ok m) :
     Ok (map f m).
-  Declare Instance mapi_ok {elt elt'}(f:key->elt->elt') m `(!Ok m) :
+  Global Declare Instance mapi_ok {elt elt'}(f:key->elt->elt') m `(!Ok m) :
     Ok (mapi f m).
-  Declare Instance merge_ok {elt elt' elt''}
+  Global Declare Instance merge_ok {elt elt' elt''}
     (f:key -> option elt -> option elt' -> option elt'') m m'
     `(!Ok m, !Ok m') :
     Ok (merge f m m').
@@ -219,7 +219,7 @@ Module WPack (K : DecidableType) (R : WS K) <: Interface.WS K.
  Record t_ (elt:Type) := Mkt {this :> R.t elt; ok : Ok this}.
  Definition t := t_.
 
- Existing Instance ok.
+ Global Existing Instance ok.
  Arguments Mkt {elt} this {ok}.
 
  (** By default, the adequacy proof attached to a map [m] will have

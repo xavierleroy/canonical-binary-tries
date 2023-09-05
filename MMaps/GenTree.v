@@ -296,7 +296,7 @@ Local Infix "==" := K.eq (at level 70).
 Class LessThan (A B : Type) := lessthan : A -> B -> Prop.
 Local Infix "<" := lessthan.
 
-Instance lt_key_key : LessThan K.t K.t := K.lt.
+Global Instance lt_key_key : LessThan K.t K.t := K.lt.
 
 (** ** Occurrence in a tree *)
 
@@ -333,11 +333,11 @@ Definition AllKeys elt (P:key->Prop) (m : t elt) :=
     [m < x] when [x] is strictly greater than any key in [m].
     [m < m'] when all keys in [m] are lower than all keys in [m']. *)
 
-Instance lt_key_map elt : LessThan K.t (t elt) :=
+Global Instance lt_key_map elt : LessThan K.t (t elt) :=
  fun x => AllKeys (lessthan x).
-Instance lt_map_key elt : LessThan (t elt) K.t :=
+Global Instance lt_map_key elt : LessThan (t elt) K.t :=
  fun m x => AllKeys (fun y => y < x) m.
-Instance lt_map_map elt : LessThan (t elt) (t elt) :=
+Global Instance lt_map_map elt : LessThan (t elt) (t elt) :=
  fun m m' => AllKeys (fun x => x < m') m.
 
 (** [Bst t] : [t] is a binary search tree *)
@@ -652,7 +652,7 @@ Qed.
 
 (** Bst is decidable *)
 
-Instance Bst_Ok {elt} (m : t elt) (B : Bst m) : Ok m := B.
+Global Instance Bst_Ok {elt} (m : t elt) (B : Bst m) : Ok m := B.
 
 Fixpoint above {elt} x (m : t elt) :=
  match m with

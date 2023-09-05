@@ -610,7 +610,7 @@ Proof. reflexivity. Qed.
 Definition MapsTo {elt} := @P.MapsTo elt.
 Definition In {elt} := @P.In elt.
 
-Instance MapsTo_compat {elt} :
+Global Instance MapsTo_compat {elt} :
   Proper (K.eq==>Logic.eq==>Logic.eq==>iff) (@MapsTo elt).
 Proof.
  intros x x' Hx e e' <- m m' <-. unfold MapsTo. now rewrite Hx.
@@ -632,7 +632,7 @@ Lemma filter_spec {elt} (f:key->elt->bool) m `{!Ok m} :
  bindings (filter f m) = List.filter (fun '(k,e) => f k e) (bindings m).
 Proof. reflexivity. Qed.
 
-Instance filter_ok {elt} f (m:t elt) : Ok m -> Ok (filter f m).
+Global Instance filter_ok {elt} f (m:t elt) : Ok m -> Ok (filter f m).
 Proof.
  induction 1; simpl.
  - constructor.
@@ -661,12 +661,12 @@ Proof.
  rewrite <- IHm. now destruct (partition f m), a, f.
 Qed.
 
-Instance partition_ok1 {elt} f (m:t elt) : Ok m -> Ok (fst (partition f m)).
+Global Instance partition_ok1 {elt} f (m:t elt) : Ok m -> Ok (fst (partition f m)).
 Proof.
  rewrite partition_fst; eauto with *.
 Qed.
 
-Instance partition_ok2 {elt} f (m:t elt) : Ok m -> Ok (snd (partition f m)).
+Global Instance partition_ok2 {elt} f (m:t elt) : Ok m -> Ok (snd (partition f m)).
 Proof.
  rewrite partition_snd; eauto with *.
 Qed.
